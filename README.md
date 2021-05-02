@@ -32,3 +32,4 @@ Is a four track quantized midi looper, with the ability to filter notes by order
 - Time~Waver: unquantized looping (loop length and notes); loop mute and unmute 
 - monome grid compatibility
 - flexible width for efficient use of the 128 buttons (global variables for width and height)
+- enable other time signatures
