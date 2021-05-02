@@ -32,6 +32,7 @@ All presets are stored as txt files (lua tables) in the norns dust data folder.
 
 ## Future Work
 - more engines
+- Graph^Theory: add velocity to steps
 - Time~Waver: unquantized looping (loop length and notes); loop mute and unmute 
 - monome grid compatibility
 - flexible width for efficient use of the 128 buttons (global variables for width and height)
