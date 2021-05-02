@@ -2,7 +2,7 @@
 SuperBrain is a midi sequencer script for the norns music computer environment, originally developed for the LanchpadX controller.
 The goal of the script is to allow parallel sequencing of multiple instruments with different sequencer styles.
 
-## Main architecture
+## Main Architecture
 SuperBrain consists of five individual sequencer tracks synchronized to a master clock.
 The following attributes can be selected per track:
 - sequencer Engine
