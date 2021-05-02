@@ -26,3 +26,9 @@ Is a polyrhythm sequencer with four rows, the idea is strongly based on the mead
 
 ### Time~Waver
 Is a four track quantized midi looper, with the ability to filter notes by order of occurrence. This can enable creative ways of overdubbing and performative manipulation of former static midi loops.
+
+## Future Work
+- more engines
+- Time~Waver: unquantized looping (loop length and notes); loop mute and unmute 
+- monome grid compatibility
+- flexible width for efficient use of the 128 buttons (global variables for width and height)
