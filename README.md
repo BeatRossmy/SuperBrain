@@ -11,6 +11,8 @@ The following attributes can be selected per track:
 - midi mode ("polyphonic", "fork")
 - midi channels
 
+![MAIN](https://user-images.githubusercontent.com/39985617/116898861-322e3580-ac37-11eb-8cbc-58efb38c1664.png)
+
 The grid interface is devided in two main areas. First, a 9x4 area for the sequencer engines and a 9*4 area for note input via an isomorphic keyboard layout.
 
 The configuration of the whole system with the stored note information can be saved as up to 64 presets.
