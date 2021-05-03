@@ -15,6 +15,12 @@ The grid interface is devided in two main areas. First, a 9x4 area for the seque
 
 The configuration of the whole system with the stored note information can be saved as up to 64 presets.
 
+Internally a button handler is extracting button events based on the grid input actions and sends theses events to the main brain object with then distributes these to the isomorphic keyboard and the active track.
+The used event types are:
+- press / release
+- click / double click
+- hold / double hold (click followed with hold)
+
 ## Engines
 One sequencer engine can be used per track. Currently the following three engines are implemented:
 
@@ -37,3 +43,4 @@ All presets are stored as txt files (lua tables) in the norns dust data folder.
 - monome grid compatibility
 - flexible width for efficient use of the 128 buttons (global variables for width and height)
 - enable other time signatures
+- global parameters: matrix width, velocity, ...
