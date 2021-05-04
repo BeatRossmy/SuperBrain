@@ -5,13 +5,23 @@
 -- select LP_X as midi device 1
 -- select 4 devices on slots 2-5
 
-engine.name = "PolyPerc"
+--[[
+uncomment main_grid = grid.connect()
+if you want to use a monome grid instead of a Launchpad X
+--]]
+LP_X = include('lib/grid/LP_X')
+main_grid = LP_X.new(1,midi.connect(1),false,127)
+--main_grid = grid.connect()
+
 MusicUtil = require 'musicutil'
 tabutil = include('lib/misc/tabutil')
 include('lib/misc/helper_functions')
 
-LP_X = include('lib/grid/LP_X')
-
+--[[
+change the sc engine here
+and redefine how poly_fork should handle on and off
+--]]
+engine.name = "PolyPerc"
 include('lib/poly_fork')
 Poly_Fork.engine_on = function (pitch,vel)
   engine.amp(util.linlin(0,1,0.05,0.7,vel))
@@ -19,44 +29,12 @@ Poly_Fork.engine_on = function (pitch,vel)
 end
 Poly_Fork.engine_off = function (pitch,vel) end
 
-include('lib/track')
-include('lib/engine')
-
-QuantumPhysics = include('lib/engines/quantumphysics')
-GraphTheory = include('lib/engines/graphtheory')
-TimeWaver = include('lib/engines/timewaver')
-
-Info = include('lib/misc/info')
-include('lib/docu')
-
-engines = {GraphTheory.name,QuantumPhysics.name,TimeWaver.name}
-engine_icons = {GraphTheory.icon,QuantumPhysics.icon,TimeWaver.icon}
-new_engine = {GraphTheory.new,QuantumPhysics.new,TimeWaver.new}
-
-midi_slots = {}
-setup_device_slots = function (d_list)
-  for i,d in pairs(d_list) do midi_slots[i] = {device=midi.connect(d), name=midi.vports[d].name} end
-end
-start_midi_devices = function ()
-  for _,s in pairs(midi_slots) do s.device:start() end
-end
-continue_midi_devices = function () end
-stop_midi_devices = function ()
-  for _,s in pairs(midi_slots) do s.device:stop() end
-end
-
-BRAIN = include('lib/brain')
+include('lib/brain')
+BRAIN = Brain(main_grid)
 MENU_ENC = 0
-
-
---[[
-=========================================================================
-=========================================================================
---]]
 
 function init()
   setup_device_slots({2,3,4,5})
-  
   BRAIN:init()
   BRAIN:set_visible(1)
   
@@ -68,16 +46,9 @@ function key(n,z)
     if BRAIN.ui_mode == "apps" then BRAIN.ui_mode = "settings"
     else BRAIN.ui_mode = "apps" end
     print(BRAIN.ui_mode)
-  end
-  
-  if n==2 then
-    if z==1 then
-      MENU_ENC = 1
-      BRAIN.help = true
-    else
-      BRAIN.help = false  
-      MENU_ENC = 1
-    end
+  elseif n==2 then
+    MENU_ENC = 1
+    BRAIN.help = z==1
   end
 end
 
@@ -94,7 +65,5 @@ end
 function cleanup()
   BRAIN:cleanup()
   BRAIN = nil
-  for cl_id,_ in pairs(clock.threads) do
-    clock.cancel(cl_id)
-  end
+  for cl_id,_ in pairs(clock.threads) do clock.cancel(cl_id) end
 end

@@ -132,9 +132,13 @@ QuantumPhysics = {
         if e.x<9 and e.type=="click" then
           self.rows[e.y].start = e.x
           self.rows[e.y].pos = e.x
-        elseif (e.x<9 and e.type=="double_click") or (e.x==9 and e.type=="click") then
+        elseif e.x<9 and e.type=="double_click" then
           self.rows[e.y].pos = 0
+        elseif e.x==9 and e.type=="click" then
+          if self.rows[e.y].pos>0 then self.rows[e.y].pos = 0
+          else self.rows[e.y].pos = self.rows[e.y].start end
         end
+        
         
       elseif self.mode=="speed" and e.x<9 then
         -- RESETS

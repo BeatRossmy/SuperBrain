@@ -71,21 +71,13 @@ new_track = function (_id,_keys)
     
     show_settings = function (self, lp)
       -- 1st row -> engine: ...
-      for x=1,3 do
-        lp:led(x,1,x==self.engine_type and 15 or 3)
-      end
+      v_radio(lp,1,3,1,self.engine_type,3,15)
       -- 2nd row -> target: internal, midi & ports: 1-4
-      for x=1,2 do
-        lp:led(x,2,x==self.output:target_key() and 15 or 3)
-      end
-      for x=1,4 do
-        local level = self.output.target=="engine" and 1 or 3
-        lp:led(x+4,2,(level==3 and x==self.output.port) and 15 or level)
-      end
+      v_radio(lp,1,2,2,self.output:target_key(),3,15)
+      local level = self.output.target=="engine" and 1 or 3
+      v_radio(lp,5,8,2,self.output.port,level,(level==3 and 15 or level))
       -- 3rd row -> mode: poly, fork(=mono)
-      for x=1,2 do
-        lp:led(x,3,x==self.output:mode_key() and 15 or 3)
-      end
+      v_radio(lp,1,2,3,self.output:mode_key(),3,15)
       -- 4+5 row -> channels
       for x=1,16 do
         y = x<9 and 4 or 5
