@@ -1,6 +1,8 @@
 -- SUPER_BRAIN
 -- v1.0.0 @beat
--- llllllll.co/t/22222
+-- https://llllllll.co/t/superbrain-multi-engine-midi-sequencer/44781
+--
+-- multi track sequencer
 --
 -- select LP_X as midi device 1
 -- select 4 devices on slots 2-5
