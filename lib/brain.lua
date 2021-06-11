@@ -1,5 +1,6 @@
 include('lib/track')
 include('lib/engine')
+include('lib/misc/grid_util')
 
 QuantumPhysics = include('lib/engines/quantumphysics')
 GraphTheory = include('lib/engines/graphtheory')
@@ -15,6 +16,8 @@ new_engine = {GraphTheory.new,QuantumPhysics.new,TimeWaver.new}
 midi_slots = {}
 setup_device_slots = function (d_list)
   for i,d in pairs(d_list) do midi_slots[i] = {device=midi.connect(d), name=midi.vports[d].name} end
+  -- for i,d in pairs(d_list) do midi_slots[i] = {device=midi.connect(d), "MidiDevice"} end
+
 end
 start_midi_devices = function ()
   for _,s in pairs(midi_slots) do s.device:start() end
@@ -165,12 +168,12 @@ Brain = function (g)
       -- ADAPTED TO NEW LPX INDICES --
       -- ========================== --
       -- TRANSPORT
-        self.grid:led(10,1,self.transport_state=="play" and 15 or 2)
-        self.grid:led(10,2,2)
+      set_led(self.grid, 10,1,self.transport_state=="play" and 15 or 2)
+      set_led(self.grid, 10,2,2)
       
       -- TRACK SELECTION
       for i=1,#self.tracks do
-        self.grid:led(10,8-#self.tracks+i,i==self.focus and 15 or 2)
+        set_led(self.grid, 10,8-#self.tracks+i,i==self.focus and 15 or 2)
       end
       
       if self.ui_mode=="apps" then
@@ -188,11 +191,11 @@ Brain = function (g)
           local file_path = _path.data.."SUPER_BRAIN/preset_"..i..".txt"
           if util.file_exists (file_path) then
             local pos = index_to_pos[i]
-            self.grid:led(pos.x,pos.y,3)
+            set_led(self.grid, pos.x,pos.y,3)
           end
         end
         local pos = index_to_pos[self.preset]
-        self.grid:led(pos.x,pos.y,5,"fade")
+        set_led(self.grid, pos.x,pos.y,5,"fade")
       end
       
       self.grid:refresh()

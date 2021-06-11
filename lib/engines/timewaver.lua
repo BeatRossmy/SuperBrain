@@ -1,3 +1,5 @@
+include('lib/misc/grid_util')
+
 local PRE_REC = 2
 
 TimeWaver = {
@@ -108,7 +110,7 @@ TimeWaver = {
       
       draw = function (self,y,lp)
         local x = not self.length and 1 or math.floor(util.linlin(0,self.length,1,9,self.playhead))
-        lp:led(x,y,10)
+        set_led(lp, x,y,10)
       end,
         
       stop = function (self)
@@ -227,11 +229,11 @@ TimeWaver = {
       if self.view=="wave" then
         for y,w in pairs(self.waves) do
           local level = w.recording and 10 or 2
-          lp:led(9,y,level)
+          set_led(lp, 9,y,level)
           if w.length then w:draw(y,lp) end
           if not w.length and w.recording and w.start_beat>clock.get_beats() then
             local x = util.round(util.linlin(0,PRE_REC,1,8,w.start_beat-clock.get_beats()),1)
-            for i=1,x do lp:led(i,y,10) end
+            for i=1,x do set_led(lp, i,y,10) end
           end
         end
       elseif self.view=="time_frame" then
@@ -241,7 +243,7 @@ TimeWaver = {
       elseif self.view=="loop_quant" then
         for y,w in pairs(self.waves) do
           v_radio(lp,3,8,y,w.loop_quant,3,10)
-          lp:led(1,y,w.loop_quant and 3 or 10)
+          set_led(lp, 1,y,w.loop_quant and 3 or 10)
         end
       end
     end
