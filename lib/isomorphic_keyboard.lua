@@ -1,5 +1,3 @@
-include('lib/misc/grid_util')
-
 ISO_KEYS = {
   area = new_area(1,5,8,4),
   visible = true,
@@ -51,14 +49,14 @@ ISO_KEYS = {
     for i=33,64 do
       pitch = self:get_pitch_index(i)
       coo = index_to_coo(i)
-      if (pitch-self.rootnote) % 12 == 0 then set_led(lp, coo.x,coo.y,3) end
-      if (pitch-self.rootnote) % 12 == 9 then set_led(lp, coo.x,coo.y,1) end
-      if tabutil.contains(self.held_notes,pitch) or (list and tabutil.contains(list, pitch)) then set_led(lp, coo.x,coo.y,15) end 
+      if (pitch-self.rootnote) % 12 == 0 then lp:led(coo.x,coo.y,3) end
+      if (pitch-self.rootnote) % 12 == 9 then lp:led(coo.x,coo.y,1) end
+      if tabutil.contains(self.held_notes,pitch) or (list and tabutil.contains(list, pitch)) then lp:led(coo.x,coo.y,15) end 
     end
     
     -- TRANSPOSE BUTTONS
-    set_led(lp, 9,5,util.linlin(-60,40,1,15,self.offset))
-    set_led(lp, 9,6,util.linlin(-60,40,15,1,self.offset))
+    lp:led(9,5,util.linlin(-60,40,1,15,self.offset))
+    lp:led(9,6,util.linlin(-60,40,15,1,self.offset))
   end,
   
   get_pitch_index = function (self, index)

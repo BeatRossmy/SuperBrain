@@ -1,6 +1,5 @@
 include('lib/track')
 include('lib/engine')
-include('lib/misc/grid_util')
 
 QuantumPhysics = include('lib/engines/quantumphysics')
 GraphTheory = include('lib/engines/graphtheory')
@@ -16,8 +15,6 @@ new_engine = {GraphTheory.new,QuantumPhysics.new,TimeWaver.new}
 midi_slots = {}
 setup_device_slots = function (d_list)
   for i,d in pairs(d_list) do midi_slots[i] = {device=midi.connect(d), name=midi.vports[d].name} end
-  -- for i,d in pairs(d_list) do midi_slots[i] = {device=midi.connect(d), "MidiDevice"} end
-
 end
 start_midi_devices = function ()
   for _,s in pairs(midi_slots) do s.device:start() end
@@ -48,7 +45,12 @@ Brain = function (g)
       
       self.grid:all(0)
       self.grid:refresh()
-      self.grid.key = function (x,y,z) self:key(x,y,z) end
+
+      self.grid.key = function (gx,gy,gz) 
+        -- print("Key "..gx.." "..gy.." "..gz)
+        self:grid_key(gx,gy,gz)
+        -- self:key(x,y,z) 
+      end
       
       self.grid_handler.grid_event = function (e) self:grid_event(e) end
       
@@ -168,12 +170,12 @@ Brain = function (g)
       -- ADAPTED TO NEW LPX INDICES --
       -- ========================== --
       -- TRANSPORT
-      set_led(self.grid, 10,1,self.transport_state=="play" and 15 or 2)
-      set_led(self.grid, 10,2,2)
+        self.grid:led(10,1,self.transport_state=="play" and 15 or 2)
+        self.grid:led(10,2,2)
       
       -- TRACK SELECTION
       for i=1,#self.tracks do
-        set_led(self.grid, 10,8-#self.tracks+i,i==self.focus and 15 or 2)
+        self.grid:led(10,8-#self.tracks+i,i==self.focus and 15 or 2)
       end
       
       if self.ui_mode=="apps" then
@@ -191,11 +193,11 @@ Brain = function (g)
           local file_path = _path.data.."SUPER_BRAIN/preset_"..i..".txt"
           if util.file_exists (file_path) then
             local pos = index_to_pos[i]
-            set_led(self.grid, pos.x,pos.y,3)
+            self.grid:led(pos.x,pos.y,3)
           end
         end
         local pos = index_to_pos[self.preset]
-        set_led(self.grid, pos.x,pos.y,5,"fade")
+        self.grid:led(pos.x,pos.y,5,"fade")
       end
       
       self.grid:refresh()
@@ -286,18 +288,18 @@ Brain = function (g)
         end
       end
     end,
-    
-    key = function (self,x,y,z)
+
+    grid_key = function (self, gx, gy, gz)
       if self.ui_mode=="apps" then
         -- KEYBOARD
-        if self.keys.area:in_area(x,y) then
-          self.keys:key(x,y,z)
+        if self.keys.area:in_area(gx,gy) then
+          self.keys:key(gx,gy,gz)
           return
         end
       end
-      self.grid_handler:key(x,y,z)
+      self.grid_handler:key(gx,gy,gz)
     end,
-    
+
     set_visible = function (self, index) 
       self.tracks[self.focus]:set_unvisible()
       self.focus = util.clamp(index,1,#self.tracks)

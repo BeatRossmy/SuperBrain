@@ -1,6 +1,5 @@
 -- ADAPTED TO NEW LPX INDICES --
 -- ========================== --
-include('lib/misc/grid_util')
 
 QuantumPhysics = {
   name = "quantum#physics",
@@ -165,21 +164,21 @@ QuantumPhysics = {
       
       if self.mode == "position" then
         for y,t in pairs(self.rows) do
-          set_led(lp, t.start,y,2)
+          lp:led(t.start,y,2)
           local level = t.pos==1 and 15 or 5
           local style = t.clock_id and nil or "fade"
-          set_led(lp, t.pos,y,level,style)
+          lp:led(t.pos,y,level,style)
           level = t.pos==0 and 2 or 5
-          set_led(lp, 9,y,level)
+          lp:led(9,y,level)
         end
       elseif self.mode=="speed" then
         for y=1,4 do
           local level = y==self.selected_row and 15 or 0
-          set_led(lp, 9,y,level)
+          lp:led(9,y,level)
           
           local resets = self.rows[self.selected_row].resets
           level = tabutil.contains(resets,y) and 15 or 2
-          set_led(lp, 8,y,level)
+          lp:led(8,y,level)
           
           v_radio(lp,1,#QuantumPhysics.speeds,y,self.rows[y].speed,2,10)
         end

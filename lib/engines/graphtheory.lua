@@ -1,6 +1,5 @@
 -- ADAPTED TO NEW LPX INDICES --
 -- ========================== --
-include('lib/misc/grid_util')
 
 GraphTheory = {
   name = "graph^theory",
@@ -195,20 +194,20 @@ GraphTheory = {
       for _,v in pairs(self.vertices) do
         if #v.notes>0 then 
           local pos = index_to_pos[v.id]
-          set_led(lp, pos.x,pos.y,2)
+          lp:led(pos.x,pos.y,2)
         end
       end
       
       -- playhead
       for i,p in pairs(self.playheads) do
-        set_led(lp, 9,p.id,p.active and 5 or 2)
+        lp:led(9,p.id,p.active and 5 or 2)
         if p.active then
           local step = p.vertex and p.vertex.id or 1
           local pos = index_to_pos[step]
           local level = self.selected_vertex and 1 or 15
           level = (self.selected_playhead and self.selected_playhead~=i) and 5 or level
           local style = p.clock_id==nil and "fade" or nil
-          set_led(lp, pos.x,pos.y,level,style)
+          lp:led(pos.x,pos.y,level,style)
         end
         
       end
@@ -217,17 +216,17 @@ GraphTheory = {
         local p = self.playheads[self.selected_playhead]
         if p.start then
           local pos = index_to_pos[p.start]
-          set_led(lp, pos.x,pos.y,15)
+          lp:led(pos.x,pos.y,15)
         end
       end
       
       -- selected vertex
       if self.selected_vertex then
         local pos = index_to_pos[self.selected_vertex]
-        set_led(lp, pos.x,pos.y,15)
+        lp:led(pos.x,pos.y,15)
         for _,e in pairs(self.vertices[self.selected_vertex].edges) do
           local pos = index_to_pos[e]
-          set_led(lp, pos.x,pos.y,15,"fade")
+          lp:led(pos.x,pos.y,15,"fade")
         end
       end
       

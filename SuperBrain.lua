@@ -12,8 +12,11 @@ uncomment main_grid = grid.connect()
 if you want to use a monome grid instead of a Launchpad X
 --]]
 LP_X = include('lib/grid/LP_X')
--- main_grid = LP_X.new(1,midi.connect(1),false,127)
-main_grid = grid.connect()
+Grid128 = include('lib/grid/Grid128')
+--main_grid = LP_X.new(1,midi.connect(1),false,127)
+main_grid = Grid128.new(1, grid.connect())
+
+--main_grid = grid.connect()
 
 MusicUtil = require 'musicutil'
 tabutil = include('lib/misc/tabutil')
@@ -37,7 +40,6 @@ MENU_ENC = 0
 
 function init()
   setup_device_slots({2,3,4,5})
-  print("superbrain init")
   BRAIN:init()
   BRAIN:set_visible(1)
   
