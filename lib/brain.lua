@@ -31,6 +31,7 @@ Brain = function (g)
     keys = include('lib/isomorphic_keyboard'),
     tracks = {},
     ui_mode = "apps", -- "apps","settings","presets"
+    preset_mode = "load", -- "save" or "load"
     preset = 1,
     focus = 1,
     transport_state = "stop",
@@ -165,8 +166,23 @@ Brain = function (g)
       -- ADAPTED TO NEW LPX INDICES --
       -- ========================== --
       -- TRANSPORT
-        self.grid:led(10,1,self.transport_state=="play" and 15 or 2)
-        self.grid:led(10,2,2)
+      self.grid:led(10,1,self.transport_state=="play" and 15 or 2)
+      self.grid:led(10,2,2)
+      
+      if USE_GRID128 then
+        if self.ui_mode=="presets" then
+          if self.preset_mode == "save" then
+            self.grid:led(15,1,15)
+            self.grid:led(16,1,2)
+          elseif self.preset_mode == "load" then
+            self.grid:led(15,1,2)
+            self.grid:led(16,1,15)
+          end
+        else
+          self.grid:led(15,1,2)
+          self.grid:led(16,1,2)
+        end
+      end
       
       -- TRACK SELECTION
       for i=1,#self.tracks do
@@ -204,6 +220,28 @@ Brain = function (g)
       -- ADAPTED TO NEW LPX INDICES --
       -- ========================== --
       
+      if USE_GRID128 then
+        if e.y == 1 then
+          if e.x == 15 then -- presets save
+            if e.type=="hold" then
+              self.ui_mode = "presets"
+              self:set_overlay("SAVE", "")
+              self.preset_mode = "save"
+            elseif e.type=="release" and self.ui_mode=="presets" then
+              self.ui_mode = "apps"
+            end
+          elseif e.x == 16 then -- presets load
+            if e.type=="hold" then
+              self.ui_mode = "presets"
+              self:set_overlay("LOAD", "")
+              self.preset_mode = "load"
+            elseif e.type=="release" and self.ui_mode=="presets" then
+              self.ui_mode = "apps"
+            end
+          end
+        end
+      end
+      
       -- TOP BAR
       if e.x==10 then
         -- TRANSPORT
@@ -222,121 +260,135 @@ Brain = function (g)
                 clock.sync(4)
                 b.transport_state="play"
                 start_midi_devices() end, self)
-            elseif self.transport_state=="stop" then
-              stop_midi_devices()
+              elseif self.transport_state=="stop" then
+                stop_midi_devices()
+              end
+            end
+            
+            -- PRESETS
+          elseif e.y==3 then
+            if not USE_GRID128 then
+              if e.type=="hold" then
+                self.ui_mode = "presets"
+              elseif e.type=="release" and self.ui_mode=="presets" then
+                self.ui_mode = "apps"
+              end
+            end
+            
+            -- TRACKS
+          elseif e.y>8-#self.tracks then
+            local t = e.y-(8-#self.tracks)
+            self:set_visible(t)
+            if (e.type=="double_click") then
+              self.tracks[t]:reset_engine()
+            elseif e.type=="hold" then
+              self.ui_mode = "settings"
+            elseif e.type=="release" then
+              self.ui_mode = "apps"
             end
           end
           
-        -- PRESTS
-        elseif e.y==3 then
-          if e.type=="hold" then
-            self.ui_mode = "presets"
-          elseif e.type=="release" and self.ui_mode=="presets" then
-            self.ui_mode = "apps"
+          -- ADAPTED TO NEW LPX INDICES --
+          -- ========================== --
+          
+          -- SIDE
+        elseif e.x==9 then
+          -- ENGINE SIDE BUTTONS
+          if (e.y<5) and self.ui_mode=="apps" then
+            sel_tr.engine:grid_event(e)
+            -- TRANSPOSE
+          elseif (e.y==5 or e.y==6) and self.ui_mode=="apps" then
+            if (e.type=="press" or e.type=="double") then self.keys:transpose(e.y==5 and 1 or -1) end
           end
           
-        -- TRACKS
-        elseif e.y>8-#self.tracks then
-          local t = e.y-(8-#self.tracks)
-          self:set_visible(t)
-          if (e.type=="double_click") then
-            self.tracks[t]:reset_engine()
-          elseif e.type=="hold" then
-            self.ui_mode = "settings"
-          elseif e.type=="release" then
-            self.ui_mode = "apps"
+          -- MATRIX
+        elseif e.x<9 and e.y<9 then
+          -- APPS
+          if self.ui_mode=="apps" then
+            if self.ui_mode=="apps" then sel_tr.engine:grid_event(e) end
+            -- SETTINGS
+          elseif self.ui_mode=="settings" and (e.type=="press" or e.type=="double") and e.y<9 then
+            sel_tr:handle_settings(e)
+            -- PRESETS
+          elseif self.ui_mode=="presets" and e.y<9 then
+            local pre_nr = (e.y-1)*8+e.x
+            
+            if USE_GRID128 then
+              if self.preset_mode == "save" then
+                self:save_preset(pre_nr)
+                self:set_overlay("save "..pre_nr, "")
+              elseif self.preset_mode == "load" then
+                self.preset = pre_nr
+                self:load_preset(pre_nr)
+                self:set_overlay("load "..pre_nr, "")
+              end
+            else  
+              if e.type=="click" then
+                print("select",pre_nr)
+                self.preset = pre_nr
+                self:load_preset(pre_nr)
+              elseif e.type=="hold" then
+                print("save to",pre_nr)
+                self:save_preset(pre_nr)
+              end
+            end
           end
+        end
+      end,
+      
+      key = function (self,x,y,z)
+        if self.ui_mode=="apps" then
+          -- KEYBOARD
+          if self.keys.area:in_area(x,y) then
+            self.keys:key(x,y,z)
+            return
+          end
+        end
+        self.grid_handler:key(x,y,z)
+      end,
+      
+      set_visible = function (self, index) 
+        self.tracks[self.focus]:set_unvisible()
+        self.focus = util.clamp(index,1,#self.tracks)
+        self.tracks[self.focus]:set_visible()
+      end,
+      
+      save_preset = function (self,pre_nr)
+        local preset_table = {}
+        
+        for i,t in pairs(self.tracks) do
+          -- local s = {id=t.id, engine=t.engine, output=t.output:get()}
+          preset_table[i] = t:get_state_for_preset()
         end
         
-      -- ADAPTED TO NEW LPX INDICES --
-      -- ========================== --
+        tabutil.save(preset_table, _path.data.."SUPER_BRAIN/preset_"..pre_nr..".txt")
+      end,
       
-      -- SIDE
-      elseif e.x==9 then
-        -- ENGINE SIDE BUTTONS
-        if (e.y<5) and self.ui_mode=="apps" then
-          sel_tr.engine:grid_event(e)
-        -- TRANSPOSE
-        elseif (e.y==5 or e.y==6) and self.ui_mode=="apps" then
-          if (e.type=="press" or e.type=="double") then self.keys:transpose(e.y==5 and 1 or -1) end
-        end
-      
-      -- MATRIX
-      elseif e.x<9 and e.y<9 then
-        -- APPS
-        if self.ui_mode=="apps" then
-          if self.ui_mode=="apps" then sel_tr.engine:grid_event(e) end
-        -- SETTINGS
-        elseif self.ui_mode=="settings" and (e.type=="press" or e.type=="double") and e.y<9 then
-          sel_tr:handle_settings(e)
-        -- PRESETS
-        elseif self.ui_mode=="presets" and e.y<9 then
-          local pre_nr = (e.y-1)*8+e.x
-          if e.type=="click" then
-            print("select",pre_nr)
-            self.preset = pre_nr
-            self:load_preset(pre_nr)
-          elseif e.type=="hold" then
-            print("save to",pre_nr)
-            self:save_preset(pre_nr)
+      load_preset = function (self, pre_nr)
+        local file_path = _path.data.."SUPER_BRAIN/preset_"..pre_nr..".txt"
+        if util.file_exists (file_path) then
+          -- load from file
+          local saved_data = tabutil.load(file_path)
+          for i,t in pairs(self.tracks) do
+            t:load_preset(saved_data[i])
+          end
+          print("loaded "..pre_nr)
+        else
+          for i,t in pairs(self.tracks) do
+            --t:default()
+            print("set to default")
           end
         end
-      end
-    end,
-    
-    key = function (self,x,y,z)
-      if self.ui_mode=="apps" then
-        -- KEYBOARD
-        if self.keys.area:in_area(x,y) then
-          self.keys:key(x,y,z)
-          return
-        end
-      end
-      self.grid_handler:key(x,y,z)
-    end,
-    
-    set_visible = function (self, index) 
-      self.tracks[self.focus]:set_unvisible()
-      self.focus = util.clamp(index,1,#self.tracks)
-      self.tracks[self.focus]:set_visible()
-    end,
-    
-    save_preset = function (self,pre_nr)
-      local preset_table = {}
+      end,
       
-      for i,t in pairs(self.tracks) do
-        -- local s = {id=t.id, engine=t.engine, output=t.output:get()}
-        preset_table[i] = t:get_state_for_preset()
-      end
-    
-      tabutil.save(preset_table, _path.data.."SUPER_BRAIN/preset_"..pre_nr..".txt")
-    end,
-    
-    load_preset = function (self, pre_nr)
-      local file_path = _path.data.."SUPER_BRAIN/preset_"..pre_nr..".txt"
-      if util.file_exists (file_path) then
-        -- load from file
-        local saved_data = tabutil.load(file_path)
-        for i,t in pairs(self.tracks) do
-          t:load_preset(saved_data[i])
+      cleanup = function (self)
+        for _,t in pairs(self.tracks) do
+          if t.output then t.output:kill_all_notes() end
         end
-        print("loaded "..pre_nr)
-      else
-        for i,t in pairs(self.tracks) do
-          --t:default()
-          print("set to default")
-        end
+        
+        if self.grid.enter_mode then self.grid:enter_mode("live") end
       end
-    end,
-    
-    cleanup = function (self)
-      for _,t in pairs(self.tracks) do
-        if t.output then t.output:kill_all_notes() end
-      end
-      
-      if self.grid.enter_mode then self.grid:enter_mode("live") end
-    end
-  }
-end
-
--- return BRAIN
+    }
+  end
+  
+  -- return BRAIN

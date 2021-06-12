@@ -14,7 +14,7 @@ Grid128.new = function (_id, _grid)
       self:set_aftertouch (self.aftertouch_active)
       self:intensity (self.intensity_level)
       
-      for x=1,10 do
+      for x=1,16 do
         self.leds[x] = {}
         self.ledBuffer[x] = {} 
         for y=1,8 do
@@ -50,10 +50,11 @@ Grid128.new = function (_id, _grid)
     
     --                          c1= brightness c2=color
     led = function (self, x, y, val,t)
-      if x>10 or x<1 or y>8 or y<1 then return end
-      
-    --   self.ledBuffer[x][y] = nil
-      self.ledBuffer[x][y] = util.round(val)
+      if x>16 or x<1 or y>8 or y<1 then return end
+
+      val = util.clamp(util.round(val), 0, 15)
+      --   self.ledBuffer[x][y] = nil
+      self.ledBuffer[x][y] = val
     --   if t=="fade" then
     --     val = val>0 and math.floor(util.linlin(1,15,1,3,val)) or 0
     --     self.ledBuffer[x][y] = COLOR.new(2,pos_to_midi[x][y],val)
@@ -64,7 +65,7 @@ Grid128.new = function (_id, _grid)
     end,
     
     all = function (self, val)
-      for x=1,10 do
+      for x=1,16 do
         for y=1,8 do
           val = val>0 and val or 0
           self.ledBuffer[x][y] = val
@@ -88,7 +89,7 @@ Grid128.new = function (_id, _grid)
 
       self.grid:all(0)
 
-      for x=1,10 do
+      for x=1,16 do
         for y=1,8 do
 
             if self.ledBuffer[x][y] ~= self.leds[x][y] then
