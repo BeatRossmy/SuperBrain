@@ -121,20 +121,29 @@ QuantumPhysics = {
     end
     
     qp.grid_event = function (self,e)
+      -- print("Quantum Physics event "..e.x.." "..e.y.." "..e.z)
+      -- print("e.type = "..e.type)
+
       if e.x==9 and e.type=="hold" then
         self.mode = "speed"
         self.selected_row = e.y
+        -- print("Selected row "..e.y)
+
       elseif e.x==9 and e.type=="release" then
+        -- print("Release")
+
         self.mode = "position"
         self.selected_row = nil
         
       elseif self.mode=="position" then
-        if e.x<9 and e.type=="click" then
+        -- print("Position")
+
+        if e.x<9 and e.type=="press" then
           self.rows[e.y].start = e.x
           self.rows[e.y].pos = e.x
-        elseif e.x<9 and e.type=="double_click" then
+        elseif e.x<9 and e.type=="double" then
           self.rows[e.y].pos = 0
-        elseif e.x==9 and e.type=="click" then
+        elseif e.x==9 and e.type=="press" then
           if self.rows[e.y].pos>0 then self.rows[e.y].pos = 0
           else self.rows[e.y].pos = self.rows[e.y].start end
         end
@@ -142,7 +151,7 @@ QuantumPhysics = {
         
       elseif self.mode=="speed" and e.x<9 then
         -- RESETS
-        if e.x==8 and e.type=="click" then
+        if e.x==8 and e.type=="press" then
           local resets = self.rows[self.selected_row].resets
           k = tabutil.key(resets,e.y)
           local action = k and table.remove or table.insert
@@ -150,7 +159,7 @@ QuantumPhysics = {
           BRAIN:set_overlay("reset",e.y)
         
         -- SPEED
-        elseif e.x<6 and e.type=="click" then
+        elseif e.x<6 and e.type=="press" then
           self.rows[e.y]:set_speed(e.x)
           BRAIN:set_overlay("speed",QuantumPhysics.speeds[e.x])
         end

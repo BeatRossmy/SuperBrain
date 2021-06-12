@@ -186,15 +186,15 @@ TimeWaver = {
       end
       
       if self.view=="wave" and e.x==9 then
-        if e.type=="click" then
+        if e.type=="press" then
           self.waves[e.y]:toggle_mode()
-        elseif e.type=="double_click"then
+        elseif e.type == "double" then
           self.waves[e.y]:clear()
           BRAIN:set_overlay("clear loop")
         end
       elseif self.view=="wave" and e.x<9 then
         local w = self.waves[e.y]
-        if e.type=="click" and not w.length and not w.recording and w.loop_quant then
+        if e.type=="press" and not w.length and not w.recording and w.loop_quant then
           w.length= e.x*TimeWaver.loop_quantization[w.loop_quant]
           w:play()
           BRAIN:set_overlay("create loop", w.length)

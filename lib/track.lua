@@ -104,6 +104,7 @@ new_track = function (_id,_keys)
     save = function (self)
       e = self.engine and self.engine:get() or {}
       s = {id=self.id, engine=e, output=self.output:get()}
+
       tabutil.save(s, _path.data.."SUPER_BRAIN/"..self.id.."_track_state.txt")
     end,
     

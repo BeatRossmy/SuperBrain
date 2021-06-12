@@ -244,7 +244,7 @@ Brain = function (g)
         elseif e.y>8-#self.tracks then
           local t = e.y-(8-#self.tracks)
           self:set_visible(t)
-          if (e.type=="double_click") then
+          if (e.type=="double") then
             self.tracks[t]:reset_engine()
           elseif e.type=="hold" then
             self.ui_mode = "settings"
@@ -277,7 +277,7 @@ Brain = function (g)
         -- PRESETS
         elseif self.ui_mode=="presets" and e.y<9 then
           local pre_nr = (e.y-1)*8+e.x
-          if e.type=="click" then
+          if e.type=="press" then
             print("select",pre_nr)
             self.preset = pre_nr
             self:load_preset(pre_nr)

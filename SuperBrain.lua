@@ -8,15 +8,18 @@
 -- select 4 devices on slots 2-5
 
 --[[
-uncomment main_grid = grid.connect()
-if you want to use a monome grid instead of a Launchpad X
+-- set true if using a Monome Grid, false if using a Novation Launchpad X
 --]]
+USE_GRID128 = true
+
 LP_X = include('lib/grid/LP_X')
 Grid128 = include('lib/grid/Grid128')
---main_grid = LP_X.new(1,midi.connect(1),false,127)
-main_grid = Grid128.new(1, grid.connect())
 
---main_grid = grid.connect()
+if USE_GRID128 then
+  main_grid = Grid128.new(1, grid.connect())
+else
+  main_grid = LP_X.new(1,midi.connect(1),false,127)
+end
 
 MusicUtil = require 'musicutil'
 tabutil = include('lib/misc/tabutil')
@@ -39,7 +42,17 @@ BRAIN = Brain(main_grid)
 MENU_ENC = 0
 
 function init()
-  setup_device_slots({2,3,4,5})
+  -- Create data directory if it doesn't exist
+  if not util.file_exists(_path.data.."SUPER_BRAIN/") then
+    util.make_dir(_path.data.."SUPER_BRAIN/")
+    print("Made SUPER_BRAIN data directory")
+  end
+
+  if USE_GRID128 then
+    setup_device_slots({1,2,3,4})
+  else
+    setup_device_slots({2,3,4,5})
+  end
   BRAIN:init()
   BRAIN:set_visible(1)
   
