@@ -45,12 +45,7 @@ Brain = function (g)
       
       self.grid:all(0)
       self.grid:refresh()
-
-      self.grid.key = function (gx,gy,gz) 
-        -- print("Key "..gx.." "..gy.." "..gz)
-        self:grid_key(gx,gy,gz)
-        -- self:key(x,y,z) 
-      end
+      self.grid.key = function (x,y,z) self:key(x,y,z) end
       
       self.grid_handler.grid_event = function (e) self:grid_event(e) end
       
@@ -244,7 +239,7 @@ Brain = function (g)
         elseif e.y>8-#self.tracks then
           local t = e.y-(8-#self.tracks)
           self:set_visible(t)
-          if (e.type=="double") then
+          if (e.type=="double_click") then
             self.tracks[t]:reset_engine()
           elseif e.type=="hold" then
             self.ui_mode = "settings"
@@ -277,7 +272,7 @@ Brain = function (g)
         -- PRESETS
         elseif self.ui_mode=="presets" and e.y<9 then
           local pre_nr = (e.y-1)*8+e.x
-          if e.type=="press" then
+          if e.type=="click" then
             print("select",pre_nr)
             self.preset = pre_nr
             self:load_preset(pre_nr)
@@ -288,18 +283,18 @@ Brain = function (g)
         end
       end
     end,
-
-    grid_key = function (self, gx, gy, gz)
+    
+    key = function (self,x,y,z)
       if self.ui_mode=="apps" then
         -- KEYBOARD
-        if self.keys.area:in_area(gx,gy) then
-          self.keys:key(gx,gy,gz)
+        if self.keys.area:in_area(x,y) then
+          self.keys:key(x,y,z)
           return
         end
       end
-      self.grid_handler:key(gx,gy,gz)
+      self.grid_handler:key(x,y,z)
     end,
-
+    
     set_visible = function (self, index) 
       self.tracks[self.focus]:set_unvisible()
       self.focus = util.clamp(index,1,#self.tracks)
