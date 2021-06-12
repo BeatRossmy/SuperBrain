@@ -13,9 +13,9 @@ GRID_EVENT = function (_x,_y,_z,_t)
     if last then
       dt = self.time-last.time
       self.phase = last.phase==4 and 1 or last.phase+1
-      if self.phase==3 and dt>0.3 then self.phase = 1 end
+      if self.phase==3 and dt>0.35 then self.phase = 1 end
       self.type = event_phase[self.phase]
-      if (self.phase==2 or self.phase==4) and dt<0.1 then self.type = self.phase == 2 and "click" or "double_click" end
+      if (self.phase==2 or self.phase==4) and dt<0.3 then self.type = self.phase == 2 and "click" or "double_click" end
     end
   end
   

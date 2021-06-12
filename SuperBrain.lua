@@ -7,10 +7,18 @@
 -- select LP_X as midi device 1
 -- select 4 devices on slots 2-5
 
+-- print("Midi 0 name"..midi.vports[0].name)
+
 --[[
 -- set true if using a Monome Grid, false if using a Novation Launchpad X
 --]]
 USE_GRID128 = true
+
+local midi_1_name = midi.connect(1).name
+
+if string.find(midi_1_name, "Launchpad") then
+  USE_GRID128 = false
+end
 
 LP_X = include('lib/grid/LP_X')
 Grid128 = include('lib/grid/Grid128')

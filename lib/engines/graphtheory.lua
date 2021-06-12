@@ -118,7 +118,7 @@ GraphTheory = {
       local i = e.x+(e.y-1)*8
       
       if self.view=="speed" then
-        if e.type=="press" then
+        if e.type=="click" then
           self.playheads[e.y].speed = e.x
           BRAIN:set_overlay("speed",GraphTheory.speeds[e.x])
         end
@@ -127,14 +127,14 @@ GraphTheory = {
       if e.x==9 then
         if e.type=="double_hold" then self.view = GraphTheory.views[e.y]
         elseif e.type=="release" then self.view = GraphTheory.views[0]
-        elseif e.type=="press" then self.playheads[e.y].active = not self.playheads[e.y].active
+        elseif e.type=="click" then self.playheads[e.y].active = not self.playheads[e.y].active
         elseif e.type=="hold" and not self.selected_playhead then self.selected_playhead = e.y end
         if e.y==self.selected_playhead and e.type=="release" then self.selected_playhead = nil end
         return  
       end
       
       if self.selected_playhead then
-        if e.type=="press" then
+        if e.type=="click" then
           self.playheads[self.selected_playhead].next = self.vertices[i]
         elseif e.type=="hold" and e.x<9 then
           self.playheads[self.selected_playhead].start = i
@@ -146,7 +146,7 @@ GraphTheory = {
       if e.type=="hold" and not self.selected_vertex then self.selected_vertex = i
       elseif e.type=="release" and self.selected_vertex == i then self.selected_vertex = nil end
         
-      if e.type=="press" then
+      if e.type=="click" then
         if self.selected_vertex then self.vertices[self.selected_vertex]:set_edge(i)
         elseif #self.keys:get_held_notes()>0 then 
           for _,n in pairs(self.keys:get_held_notes()) do
@@ -155,7 +155,7 @@ GraphTheory = {
         end
       end
       
-      if e.type=="double" then self.vertices[i].notes = {} end
+      if e.type=="double_click" then self.vertices[i].notes = {} end
     end
     
     gt.note_on = function (self,pitch,vel)
