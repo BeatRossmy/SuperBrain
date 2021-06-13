@@ -185,6 +185,8 @@ QuantumPhysics = {
       end
     end
     
+    if BRAIN.transport_state=="play" then qp:play() end
+    
     return qp
   end
 }
