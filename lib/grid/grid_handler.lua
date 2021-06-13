@@ -1,5 +1,5 @@
 local event_phase = {"press","release","double","release"}
-local HOLD_TIME = 0.25
+local HOLD_TIME = 0.3
 
 GRID_EVENT_mt = {__eq = function (e1, e2) return (e1.x==e2.x and e1.y==e2.y) end}
 GRID_EVENT = function (_x,_y,_z,_t)
@@ -13,9 +13,9 @@ GRID_EVENT = function (_x,_y,_z,_t)
     if last then
       dt = self.time-last.time
       self.phase = last.phase==4 and 1 or last.phase+1
-      if self.phase==3 and dt>0.3 then self.phase = 1 end
+      if self.phase==3 and dt>0.4 then self.phase = 1 end
       self.type = event_phase[self.phase]
-      if (self.phase==2 or self.phase==4) and dt<0.1 then self.type = self.phase == 2 and "click" or "double_click" end
+      if (self.phase==2 or self.phase==4) and dt<0.25 then self.type = self.phase == 2 and "click" or "double_click" end
     end
   end
   

@@ -1,6 +1,10 @@
 new_area = function (_x,_y,_w,_h)
   a = {x=_x,y=_y,w=_w,h=_h}
   a.in_area = function (self,x,y)
+
+    -- print("In Area "..x.." "..y)
+    -- print("w,h Area "..self.x.." "..self.y)
+
     return (x>=self.x and y>=self.y and x<self.x+self.w and y<self.y+self.h)
   end
   return a
